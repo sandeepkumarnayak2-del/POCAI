@@ -11,11 +11,13 @@ def seed():
     db = SessionLocal()
 
     users = [
-        ("alice", "alice123", "user"),
-        ("bob", "bob123", "user"),
-        ("agent", "agent123", "agent"),
-        ("admin", "admin123", "admin"),
-    ]
+    ("sandeep", "sandeep123", "user"),
+    ("smarajit", "smarajit123", "user"),
+    ("alice", "alice123", "user"),
+    ("bob", "bob123", "user"),
+    ("agent", "agent123", "agent"),
+    ("admin", "admin123", "admin"),
+]
 
     try:
         for username, password, role in users:
