@@ -1,36 +1,63 @@
-from pathlib import Path
-import chromadb
-from sentence_transformers import SentenceTransformer
-from app.config import settings
+import re
 
-_model = None
-_collection = None
+from rank_bm25 import BM25Okapi
 
-def _get():
-    global _model, _collection
-    if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-    if _collection is None:
-        Path(settings.chroma_path).mkdir(parents=True, exist_ok=True)
-        client = chromadb.PersistentClient(path=settings.chroma_path)
-        _collection = client.get_or_create_collection("it_knowledge")
-    return _model, _collection
+
+_documents = []
+_bm25 = None
+
+
+def _tokenize(text):
+    return re.findall(r"\b\w+\b", text.lower())
+
 
 def add_documents(docs):
-    model, col = _get()
-    texts = [d["text"] for d in docs]
-    embeddings = model.encode(texts).tolist()
-    ids = [d["id"] for d in docs]
-    metas = [{"source": d["source"], "title": d["title"]} for d in docs]
-    col.upsert(ids=ids, documents=texts, embeddings=embeddings, metadatas=metas)
+    global _documents, _bm25
+
+    _documents = list(docs)
+
+    tokenized_docs = [
+        _tokenize(doc["text"])
+        for doc in _documents
+    ]
+
+    if tokenized_docs:
+        _bm25 = BM25Okapi(tokenized_docs)
+    else:
+        _bm25 = None
+
 
 def search(query, k=5):
-    model, col = _get()
-    emb = model.encode([query]).tolist()
-    if col.count() == 0:
+    if not _documents or _bm25 is None:
         return []
-    r = col.query(query_embeddings=emb, n_results=min(k, col.count()))
-    return [
-        {"text": doc, "source": meta.get("source",""), "title": meta.get("title","")}
-        for doc, meta in zip(r["documents"][0], r["metadatas"][0])
-    ]
+
+    query_tokens = _tokenize(query)
+
+    if not query_tokens:
+        return []
+
+    scores = _bm25.get_scores(query_tokens)
+
+    ranked_indexes = sorted(
+        range(len(scores)),
+        key=lambda i: scores[i],
+        reverse=True,
+    )
+
+    results = []
+
+    for index in ranked_indexes[:k]:
+        if scores[index] <= 0:
+            continue
+
+        doc = _documents[index]
+
+        results.append(
+            {
+                "text": doc["text"],
+                "source": doc.get("source", ""),
+                "title": doc.get("title", ""),
+            }
+        )
+
+    return results
