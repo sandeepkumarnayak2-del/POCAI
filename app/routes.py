@@ -171,10 +171,21 @@ def clear_history(user=Depends(current_user)):
 def approvals(user=Depends(current_user)):
     db = SessionLocal()
     try:
-        q = db.query(Approval)
+        q = db.query(Approval).filter(Approval.status == "pending")
+
         if user.role not in ("helpdesk", "admin"):
             q = q.filter(Approval.username == user.username)
-        return [{"id": a.id, "username": a.username, "action": a.action, "payload": a.payload, "status": a.status} for a in q.order_by(Approval.id.desc()).all()]
+
+        return [
+            {
+                "id": a.id,
+                "username": a.username,
+                "action": a.action,
+                "payload": a.payload,
+                "status": a.status,
+            }
+            for a in q.order_by(Approval.id.desc()).all()
+        ]
     finally:
         db.close()
 

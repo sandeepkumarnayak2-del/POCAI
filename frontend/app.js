@@ -157,11 +157,6 @@ chatForm.addEventListener("submit", async (event) => {
 
         if (data.approval_id) {
             await loadApprovals();
-
-            addMessage(
-                "assistant",
-                `This action requires approval. Approval ID: ${data.approval_id}`
-            );
         }
 
         await loadTickets();
