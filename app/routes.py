@@ -106,7 +106,7 @@ def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 @app.post("/chat")
-@limiter.limit("20/minute")
+@limiter.limit("10/minute")
 async def chat(request: Request, chat_request: ChatRequest, user=Depends(current_user)):
     validate_username(user.username)
     clean_message = sanitize_input(validate_message(chat_request.message, settings.max_message_length))
@@ -124,7 +124,7 @@ async def chat(request: Request, chat_request: ChatRequest, user=Depends(current
             "sources": [d["source"] for d in result.get("documents", [])]}
 
 @app.post("/chat/stream")
-@limiter.limit("20/minute")
+@limiter.limit("10/minute")
 async def chat_stream(request: Request, chat_request: ChatRequest, user=Depends(current_user)):
     clean = sanitize_input(validate_message(chat_request.message, settings.max_message_length))
     result = run_agent(user.username, user.role, clean)
