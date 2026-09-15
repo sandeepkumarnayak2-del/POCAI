@@ -1,74 +1,162 @@
 # POCAI — Enterprise AI Service Desk Agent
 
-POCAI is an enterprise-style AI Service Desk Agent demonstrating **GenAI, RAG, AI agents, secure tool execution, RBAC, human approval, and cloud deployment**.
+POCAI is a proof-of-concept AI service desk agent demonstrating RAG, agent workflows, secure tool execution, authorization, human approval, and production-oriented observability.
 
-## 🚀 Live Demo
+## Overview
 
-[Open POCAI](https://enterprise-ai-agent-api.onrender.com/ui/)
+The application can:
 
-## ✨ Features
+- Answer IT support questions using RAG
+- Retrieve information from internal IT documentation
+- Create, list, and retrieve service desk tickets
+- Require human approval before ticket creation
+- Enforce JWT authentication and role-based access
+- Enforce object-level ticket authorization
+- Protect against basic prompt-injection attempts
+- Validate and sanitize user input
+- Store application data in PostgreSQL
+- Use a Redis-compatible Key Value service for rate limiting and shared state
+- Provide health checks, metrics, logging, and audit events
 
-- **LLM:** Groq — `openai/gpt-oss-120b`
-- **Agent:** LangGraph
-- **RAG:** Chroma + internal IT documents
-- **Backend:** FastAPI
-- **Tools:** Ticket creation, listing and lookup
-- **Security:** JWT authentication, RBAC, validation and prompt-injection guardrails
-- **Human-in-the-loop:** Approval required before ticket creation
-- **Database:** PostgreSQL in production, SQLite locally
-- **Observability:** Logs, audit events and Prometheus metrics
-- **Deployment:** Docker + Render
-- **Frontend:** HTML/CSS/JavaScript
-
-## 🏗️ Architecture
+## Architecture
 
 ```text
 User
- ↓
-FastAPI → Authentication / RBAC
- ↓
+  |
+  v
+FastAPI
+  |
+  +-- Authentication / RBAC
+  |
+  v
 LangGraph Agent
- ├── RAG → Chroma → IT Documents
- ├── Tools → Tickets
- └── MCP → External Services
- ↓
+  |
+  +-- RAG ------> Chroma ------> IT Documentation
+  |
+  +-- Tools ----> Ticket Operations
+  |
+  +-- MCP -------> External Services
+  |
+  v
 Human Approval
- ↓
+  |
+  v
 PostgreSQL
- ↓
-Response + Audit / Metrics
+  |
+  v
+Response
 ```
 
-**Key principle:** The LLM handles reasoning, while application code enforces authorization and business rules.
+## Technology
 
-## 🎫 Example
+- Python
+- FastAPI
+- LangGraph
+- LangChain
+- Groq / GPT-OSS
+- Chroma
+- PostgreSQL
+- Redis-compatible Key Value
+- JWT
+- Docker
+- Render
+- Prometheus
+
+## Observability
+
+- Health check: `/health`
+- Prometheus metrics: `/metrics`
+- Structured application logging
+- Audit events
+- LLM latency and call metrics
+- Tool-call metrics
+
+## Security
+
+Authorization is enforced by application code rather than relying on the LLM.
+
+Users can only access tickets they are authorized to view.
+
+Consequential actions require human approval before execution.
+
+Sensitive configuration such as API keys is stored as environment variables and is not committed to the repository.
+
+## Example Workflow
 
 ```text
-"My VPN is not working"
-        ↓
-RAG retrieves IT guidance
-        ↓
-"Create a high-priority ticket"
-        ↓
+User: My VPN is not working
+        |
+        v
+RAG retrieves relevant IT documentation
+        |
+        v
+User: Create a high-priority ticket
+        |
+        v
 Human approval required
-        ↓
-Approved → Ticket created
+        |
+        v
+Approved
+        |
+        v
+Ticket created in PostgreSQL
 ```
 
-## 🔐 Security
+## Live Demo
 
-Users can only access resources they are authorized to access. For example, one user cannot access another user's ticket.
+https://enterprise-ai-agent-api.onrender.com/ui/
 
-The system also handles basic prompt-injection attempts and keeps secrets such as API keys outside the application code and Git repository.
+## API Documentation
 
-## 🧰 Tech Stack
+https://enterprise-ai-agent-api.onrender.com/docs
 
-Python · FastAPI · LangGraph · LangChain · Groq · Chroma · PostgreSQL · JWT · Docker · Render · Prometheus
+## Local Development
 
-## 🎯 Purpose
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-This project demonstrates practical **AI Engineering patterns for enterprise applications**, rather than a basic LLM chatbot.
+Application:
 
-## 🔮 Future Improvements
+```text
+http://localhost:8000/ui/
+```
 
-SSO/OAuth2, ServiceNow/Jira integration, stronger RAG evaluation, distributed tracing, centralized secrets, advanced security testing and production-grade vector infrastructure.
+API documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+## Project Structure
+
+```text
+app/
+├── agents/          # LangGraph workflow
+├── auth/            # Authentication
+├── database/        # Database models and setup
+├── llm/             # LLM provider
+├── observability/   # Logging, metrics and audit
+├── rag/             # RAG implementation
+├── security/        # Validation and guardrails
+├── tools/           # Service desk tools
+└── mcp/             # MCP server
+
+frontend/             # Web UI
+data/documents/       # IT knowledge documents
+tests/                # Automated tests
+docs/                 # Architecture and deployment docs
+```
+
+## Future Improvements
+
+- Enterprise SSO / OAuth2
+- ServiceNow or Jira integration
+- Improved RAG evaluation
+- Distributed tracing
+- Advanced security testing
+- Production vector database
+- Model and prompt evaluation
