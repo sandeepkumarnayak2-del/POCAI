@@ -1,80 +1,74 @@
-# Enterprise AI Service Desk Agent
+# POCAI — Enterprise AI Service Desk Agent
 
-A small AI service-desk prototype built to explore how an LLM can work with company
-knowledge, internal tools and approval workflows.
+POCAI is an enterprise-style AI Service Desk Agent demonstrating **GenAI, RAG, AI agents, secure tool execution, RBAC, human approval, and cloud deployment**.
 
-The idea is deliberately simple: a user asks a support question, the agent looks up
-relevant internal documentation, and it can create a ticket when an action is needed.
+## 🚀 Live Demo
 
-## What is included
+[Open POCAI](https://enterprise-ai-agent-api.onrender.com/ui/)
 
-- FastAPI backend
-- Streamlit demo UI
-- LangGraph agent workflow
-- RAG over the example IT documents
-- Ticket tools with user-level access checks
-- Approval step before ticket creation
-- Basic prompt/output guardrails
-- JWT authentication
-- PostgreSQL support (SQLite is useful for local development)
-- Redis support for rate limiting
-- Request IDs and Prometheus metrics
-- MCP example server
-- Docker and Render deployment files
-- A few focused tests
+## ✨ Features
 
-## Local setup
+- **LLM:** Groq — `openai/gpt-oss-120b`
+- **Agent:** LangGraph
+- **RAG:** Chroma + internal IT documents
+- **Backend:** FastAPI
+- **Tools:** Ticket creation, listing and lookup
+- **Security:** JWT authentication, RBAC, validation and prompt-injection guardrails
+- **Human-in-the-loop:** Approval required before ticket creation
+- **Database:** PostgreSQL in production, SQLite locally
+- **Observability:** Logs, audit events and Prometheus metrics
+- **Deployment:** Docker + Render
+- **Frontend:** HTML/CSS/JavaScript
 
-Create a virtual environment and install the dependencies:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Copy `.env.example` to `.env` and add the Groq key.
-
-Start the API:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Start the UI in another terminal:
-
-```bash
-streamlit run frontend/streamlit_app.py
-```
-
-The API is available at `http://localhost:8000` and the UI at
-`http://localhost:8501`.
-
-Demo users are created automatically on startup. They are only for the local demo.
-
-## Deployment
-
-The repository contains a `render.yaml` Blueprint plus separate API and UI Dockerfiles.
-The Groq API key should be configured as a secret in Render, not committed to git.
-
-## Project layout
+## 🏗️ Architecture
 
 ```text
-app/
-  agents/          agent state and workflow
-  auth/            authentication helpers
-  database/        database models and setup
-  llm/             model configuration
-  observability/   logging, metrics and audit helpers
-  rag/             document indexing and retrieval
-  security/        validation, guardrails and rate limiting
-  tools/           business actions exposed to the agent
-frontend/           Streamlit demo
-data/documents/     example IT knowledge
-tests/              focused unit tests
-docs/               architecture and demo notes
+User
+ ↓
+FastAPI → Authentication / RBAC
+ ↓
+LangGraph Agent
+ ├── RAG → Chroma → IT Documents
+ ├── Tools → Tickets
+ └── MCP → External Services
+ ↓
+Human Approval
+ ↓
+PostgreSQL
+ ↓
+Response + Audit / Metrics
 ```
 
-This is a portfolio/POC project rather than a production security boundary. The
-authentication, permissions, model access and deployment settings would need another
-security review before being used with real company data.
+**Key principle:** The LLM handles reasoning, while application code enforces authorization and business rules.
+
+## 🎫 Example
+
+```text
+"My VPN is not working"
+        ↓
+RAG retrieves IT guidance
+        ↓
+"Create a high-priority ticket"
+        ↓
+Human approval required
+        ↓
+Approved → Ticket created
+```
+
+## 🔐 Security
+
+Users can only access resources they are authorized to access. For example, one user cannot access another user's ticket.
+
+The system also handles basic prompt-injection attempts and keeps secrets such as API keys outside the application code and Git repository.
+
+## 🧰 Tech Stack
+
+Python · FastAPI · LangGraph · LangChain · Groq · Chroma · PostgreSQL · JWT · Docker · Render · Prometheus
+
+## 🎯 Purpose
+
+This project demonstrates practical **AI Engineering patterns for enterprise applications**, rather than a basic LLM chatbot.
+
+## 🔮 Future Improvements
+
+SSO/OAuth2, ServiceNow/Jira integration, stronger RAG evaluation, distributed tracing, centralized secrets, advanced security testing and production-grade vector infrastructure.
