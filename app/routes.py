@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
 from slowapi.errors import RateLimitExceeded
+from pathlib import Path
 
 from app.config import settings
 from app.database.db import init_db, SessionLocal
@@ -42,9 +43,11 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+
 app.mount(
     "/ui",
-    StaticFiles(directory="frontend", html=True),
+    StaticFiles(directory=FRONTEND_DIR, html=True),
     name="frontend",
 )
 app.state.limiter = limiter
