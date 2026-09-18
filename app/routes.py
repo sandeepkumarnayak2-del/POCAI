@@ -30,6 +30,7 @@ class ChatRequest(BaseModel):
 class ApprovalRequest(BaseModel):
     approve: bool
 
+#Code before yield runs before startup, after runs during shutdown
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     configure_logging()
@@ -41,7 +42,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("rag_ingestion_failed", error=str(e))
     yield
-
+#Swagger name app.name
 app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
@@ -51,9 +52,12 @@ app.mount(
     name="frontend",
 )
 app.state.limiter = limiter
+
+#Browser-Https-Middlewire-API- Allow credentails, Controles the origin
 app.add_middleware(CORSMiddleware, allow_origins=[x.strip() for x in settings.cors_origins.split(",")],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
+#Not to include the re route in the docs
 @app.get("/", include_in_schema=False)
 def root():
     return RedirectResponse("/ui/")
@@ -62,6 +66,7 @@ def root():
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return Response("Rate limit exceeded", status_code=429)
 
+#Wait for that asynchronous operation to complete without blocking the event loop.
 @app.middleware("http")
 async def request_middleware(request: Request, call_next):
     request_id = str(uuid.uuid4())
@@ -78,6 +83,7 @@ def login(form: OAuth2PasswordRequestForm = Depends()):
     user = authenticate(form.username, form.password)
     if not user:
         raise HTTPException(401, "Invalid credentials")
+    #Format checks
     validate_username(user.username)
     return {"access_token": create_token(user), "token_type": "bearer", "role": user.role}
 
@@ -103,8 +109,10 @@ def health():
 
 @app.get("/metrics")
 def metrics():
+    #Prometheus
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
+#Depends(current_user)- Current user function executes and JWT validated
 @app.post("/chat")
 @limiter.limit("10/minute")
 async def chat(request: Request, chat_request: ChatRequest, user=Depends(current_user)):
@@ -120,9 +128,11 @@ async def chat(request: Request, chat_request: ChatRequest, user=Depends(current
         db.close()
     audit(user.id, "chat", "conversation", f"message_length={len(clean_message)}")
     logger.info("agent_response", username=user.username)
+    #We can show the source as well from the documents
     return {"reply": reply, "approval_id": result.get("approval_id"), "search_query": result.get("search_query"),
             "sources": [d["source"] for d in result.get("documents", [])]}
 
+#To be implemenetd. still not sterams, wait for agent response
 @app.post("/chat/stream")
 @limiter.limit("10/minute")
 async def chat_stream(request: Request, chat_request: ChatRequest, user=Depends(current_user)):

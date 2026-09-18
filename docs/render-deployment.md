@@ -1,5 +1,4 @@
-# Render Deployment — Manager Demo
-
+# Render Deployment
 ## Goal
 
 Publish the Enterprise AI Service Desk Agent on GitHub and deploy a public Streamlit URL plus a FastAPI API on Render.
@@ -54,7 +53,6 @@ Render gives the UI a public URL similar to:
 https://enterprise-ai-agent-ui.onrender.com
 ```
 
-Give that URL to your manager.
 
 The API will have another public URL:
 
@@ -71,12 +69,12 @@ Useful API pages:
 /metrics
 ```
 
-## 5. Manager demo
+## 5. demo
 
 Use:
 
 ```text
-alice / alice123
+
 ```
 
 Demo:

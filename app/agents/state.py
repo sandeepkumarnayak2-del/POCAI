@@ -1,5 +1,7 @@
 from typing import TypedDict, Any
 
+#Total false- All fileds are optional
+#Used for shared agent stares, communication
 class AgentState(TypedDict, total=False):
     username: str
     role: str

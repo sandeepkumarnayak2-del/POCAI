@@ -12,7 +12,8 @@ def configure_logging():
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.JSONRenderer(),
         ],
+        #Only process INFO and higher.”
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
     )
-
+#OP dashboard. on infra level
 logger = structlog.get_logger()

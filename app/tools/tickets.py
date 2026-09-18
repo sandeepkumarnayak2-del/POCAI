@@ -25,6 +25,7 @@ def get_ticket(ticket_id, username, role):
     finally:
         db.close()
 
+#idempotency_key- used for uniue identifier of request, else multiple request will be created
 def create_ticket(username, title, description, priority, idempotency_key=None):
     db = SessionLocal()
     try:

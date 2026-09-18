@@ -8,7 +8,7 @@ CASES = [
     ("laptop setup", "laptop"),
     ("Outlook configuration", "outlook"),
 ]
-
+#Test cases. unit test
 def run():
     passed = 0
     for q, keyword in CASES:

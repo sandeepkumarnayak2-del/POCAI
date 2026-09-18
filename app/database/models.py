@@ -47,3 +47,6 @@ class AuditLog(Base):
     resource: Mapped[str] = mapped_column(String(255), default="")
     details: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+

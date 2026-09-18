@@ -3,10 +3,7 @@ install:
 
 run:
 	uvicorn app.main:app --reload
-
-ui:
-	streamlit run frontend/streamlit_app.py
-
+	
 test:
 	pytest -q
 
@@ -21,3 +18,6 @@ down:
 
 ingest:
 	python -m app.rag.ingestion
+
+
+#Make test, make up, make down etc- shortcut for this

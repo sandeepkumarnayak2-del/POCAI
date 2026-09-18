@@ -5,7 +5,7 @@ and then move into an action.
 
 ## 1. Knowledge question
 
-Log in as `alice` and ask:
+Log in as `admin` and ask:
 
 > My VPN stopped working after my laptop update. What should I check?
 

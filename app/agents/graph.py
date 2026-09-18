@@ -9,7 +9,7 @@ from app.security.guardrails import detect_prompt_injection, output_guardrail
 from app.database.db import SessionLocal
 from app.database.models import Approval
 from app.tools.tickets import list_tickets, get_ticket, serialize
-
+import re
 
 def classify(state):
     msg = state["message"].lower()
@@ -65,11 +65,12 @@ def is_ticket_list_request(message):
 
 
 def extract_ticket_id(message):
-    words = message.lower().replace("#", " ").split()
 
-    for word in words:
-        if word.isdigit():
-            return int(word)
+    match = re.search(r"\bticket\s*#?\s*(\d+)\b", message.lower())
+
+    if match:
+
+        return int(match.group(1))
 
     return None
 

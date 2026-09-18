@@ -11,6 +11,8 @@ from app.database.models import User
 
 
 password_hash = PasswordHash.recommended()
+#OAuth2PasswordBearer does not validate the JWT itself.
+#It primarily extracts the bearer token from the request and integrates with FastAPI’s OAuth2/OpenAPI #security scheme.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 

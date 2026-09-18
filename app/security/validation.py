@@ -16,5 +16,5 @@ def validate_message(message: str, max_len: int = 1000) -> str:
     return message.strip()
 
 def sanitize_input(message: str) -> str:
-    # Lightweight POC sanitization. Do not treat this as complete prompt-injection defense.
+    # Null char removal  and empty space 
     return message.replace("\x00", "").strip()
